@@ -1,12 +1,20 @@
 {
-  "name": "vesta",
-  "version": "1.0.0",
-  "description": "This is my app for organising my cupboards and cooking!",
-  "license": "ISC",
-  "author": "",
-  "type": "commonjs",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  }
+	"name": "vesta",
+	"version": "1.0.0",
+	"description": "This is my app for organising my cupboards and cooking!",
+	"private": true,
+	"type": "module",
+	"license": "ISC",
+	"author": "",
+	"packageManager": "pnpm@12.9.1",
+	"scripts": {
+		"lint": "biome check .",
+		"format": "biome format --write .",
+		"typecheck": "pnpm -r typecheck",
+		"test": "pnpm -r test"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.5.15",
+		"typescript": "^7.0.2"
+	}
 }

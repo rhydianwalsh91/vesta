@@ -1,1 +1,4 @@
 PLAN.md
+.vscode/
+.env
+node_modules/
