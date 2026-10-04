@@ -1,0 +1,23 @@
+{
+	"name": "@vesta/core",
+	"version": "1.0.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"scripts": {
+		"typecheck": "tsc",
+		"test": "vitest run",
+		"smoke": "node --env-file=../../.env --import tsx scripts/smoke.ts"
+	},
+	"dependencies": {
+		"mongodb": "^7.7.0",
+		"zod": "^4.6.5"
+	},
+	"devDependencies": {
+		"@types/node": "latest",
+		"tsx": "latest",
+		"vitest": "^5.0.3"
+	}
+}
