@@ -175,6 +175,9 @@ importers:
 
   packages/core:
     dependencies:
+      '@vesta/shared':
+        specifier: workspace:*
+        version: link:../shared
       mongodb:
         specifier: ^7.7.0
         version: 7.7.0
