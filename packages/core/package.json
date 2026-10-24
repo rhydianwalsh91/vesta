@@ -13,7 +13,8 @@
 	},
 	"dependencies": {
 		"mongodb": "^7.7.0",
-		"zod": "^4.6.5"
+		"zod": "^4.6.5",
+		"@vesta/shared": "workspace:*"
 	},
 	"devDependencies": {
 		"@types/node": "latest",
