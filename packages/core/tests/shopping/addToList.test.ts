@@ -1,35 +1,9 @@
-import { MongoClient, ObjectId } from "mongodb";
-import { MongoMemoryServer } from "mongodb-memory-server";
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
-import { collections, type PantryItemDoc } from "../../src/db.js";
+import { describe, expect, it } from "vitest";
+import { collections } from "../../src/db.js";
 import { addToList } from "../../src/shopping/addToList.js";
+import { pantryItem, useTestDb } from "../helpers.js";
 
-let server: MongoMemoryServer;
-let client: MongoClient;
-const db = () => client.db("test");
-
-beforeAll(async () => {
-	server = await MongoMemoryServer.create();
-	client = await MongoClient.connect(server.getUri());
-});
-
-afterAll(async () => {
-	await client.close();
-	await server.stop();
-});
-
-beforeEach(async () => {
-	await db().dropDatabase();
-});
-
-const pantryItem = (name: string): PantryItemDoc => ({
-	_id: new ObjectId(),
-	householdId: "h1",
-	ingredientId: new ObjectId().toHexString(),
-	name,
-	status: "in",
-	schemaVersion: 1,
-});
+const db = useTestDb();
 
 describe("addToList", () => {
 	it("creates the active list and adds an entry on the first scan", async () => {
