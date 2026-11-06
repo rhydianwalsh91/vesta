@@ -1,3 +1,5 @@
+import { getList } from "@vesta/core";
+
 import { Hono } from "hono";
 import type { Db } from "mongodb";
 
@@ -18,5 +20,11 @@ export function createApp(db: Db, auth: Auth) {
 	app.get("/health", (c) => {
 		return c.json({ ok: true });
 	});
+
+	app.get("/api/list", async (c) => {
+		const list = await getList(db, c.get("householdId"));
+		return c.json(list);
+	});
+
 	return app;
 }
