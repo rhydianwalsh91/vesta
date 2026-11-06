@@ -1,5 +1,6 @@
 import { assignTag, scan } from "@vesta/core";
-import { describe, expect, it } from "vitest";
+import type { Db } from "mongodb";
+import { describe, expect, it, vi } from "vitest";
 import { createApp } from "../src/app.js";
 import { useTestDb } from "./helpers.js";
 
@@ -13,13 +14,6 @@ describe("app", () => {
 
 		expect(res.status).toBe(200);
 		expect(await res.json()).toEqual({ ok: true });
-	});
-
-	it("auth middleware exposes the household to /api routes", async () => {
-		const app = createApp(db(), auth);
-		const res = await app.request("/api/whoami");
-
-		expect(await res.json()).toEqual({ householdId: "h1" });
 	});
 
 	it("GET /api/list returns an empty array when nothing is on the list", async () => {
@@ -170,5 +164,21 @@ describe("app", () => {
 
 	it("DELETE /api/list/entries/:id returns 404 for an unknown entry", async () => {
 		expect((await del("nope")).status).toBe(404);
+	});
+
+	it("returns a generic 500 without leaking details when something throws", async () => {
+		const brokenDb = {
+			collection: () => {
+				throw new Error("secret connection string");
+			},
+		} as unknown as Db;
+		const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+		const res = await createApp(brokenDb, auth).request("/api/list");
+
+		expect(res.status).toBe(500);
+		expect(await res.json()).toEqual({ error: "Internal error" });
+		expect(spy).toHaveBeenCalled();
+		spy.mockRestore();
 	});
 });

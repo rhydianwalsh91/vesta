@@ -29,11 +29,6 @@ export function createApp(db: Db, auth: Auth) {
 		await next();
 	});
 
-	// Ensure Household ID variable exists
-	app.get("/api/whoami", (c) => {
-		return c.json({ householdId: c.get("householdId") });
-	});
-
 	// Ensure API up and running
 	app.get("/health", (c) => {
 		return c.json({ ok: true });
@@ -113,6 +108,12 @@ export function createApp(db: Db, auth: Auth) {
 				: c.json({ error: "Entry not found" }, 404);
 		},
 	);
+
+	// Anything unexpected: log it, but never leak details to the client.
+	app.onError((err, c) => {
+		console.error(err);
+		return c.json({ error: "Internal error" }, 500);
+	});
 
 	return app;
 }
