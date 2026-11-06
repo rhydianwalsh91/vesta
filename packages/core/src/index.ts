@@ -9,7 +9,7 @@ export {
 	type ShoppingListDoc,
 	type TagDoc,
 } from "./db.js";
-export { assignTag } from "./pantry/assignTag.js";
+export { assignTag, TagAlreadyAssignedError } from "./pantry/assignTag.js";
 export { scan } from "./pantry/scan.js";
 export { addToList } from "./shopping/addToList.js";
 export { getList, removeEntry, updateEntry } from "./shopping/list.js";

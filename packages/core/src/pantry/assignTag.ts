@@ -2,6 +2,12 @@ import type { AssignTagInput } from "@vesta/shared";
 import { type Db, ObjectId } from "mongodb";
 import { collections, type PantryItemDoc } from "../db.js";
 
+export class TagAlreadyAssignedError extends Error {
+	constructor(tagId: string) {
+		super(`Tag ${tagId} is already assigned`);
+	}
+}
+
 export async function assignTag(
 	db: Db,
 	householdId: string,
@@ -10,8 +16,7 @@ export async function assignTag(
 ): Promise<PantryItemDoc> {
 	const c = collections(db);
 	const existingTag = await c.tags.findOne({ _id: tagId, householdId });
-	if (existingTag?.pantryItemId)
-		throw new Error(`Tag ${tagId} is already assigned`);
+	if (existingTag?.pantryItemId) throw new TagAlreadyAssignedError(tagId);
 
 	// Reuse an ingredient that matches by name or alias, otherwise create one.
 	let ingredient = await c.ingredients.findOne({
