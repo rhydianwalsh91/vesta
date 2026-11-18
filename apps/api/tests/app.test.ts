@@ -90,7 +90,10 @@ describe("app", () => {
 		});
 
 		expect(res.status).toBe(201);
-		expect(await res.json()).toMatchObject({ name: "Olive oil", status: "in" });
+		const item = await res.json();
+		expect(item).toMatchObject({ name: "Olive oil", status: "in" });
+		expect(item).toHaveProperty("id");
+		expect(item).not.toHaveProperty("_id");
 		const scanned = await (await post("/api/scan/abc234")).json();
 		expect(scanned).toMatchObject({
 			result: "added",

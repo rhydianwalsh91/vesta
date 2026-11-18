@@ -1,4 +1,4 @@
-import type { AssignTagInput } from "@vesta/shared";
+import type { AssignTagInput, PantryItem } from "@vesta/shared";
 import { type Db, ObjectId } from "mongodb";
 import { collections, type PantryItemDoc } from "../db.js";
 
@@ -13,7 +13,7 @@ export async function assignTag(
 	householdId: string,
 	tagId: string,
 	input: AssignTagInput,
-): Promise<PantryItemDoc> {
+): Promise<PantryItem> {
 	const c = collections(db);
 	const existingTag = await c.tags.findOne({ _id: tagId, householdId });
 	if (existingTag?.pantryItemId) throw new TagAlreadyAssignedError(tagId);
@@ -55,5 +55,6 @@ export async function assignTag(
 		},
 		{ upsert: true },
 	);
-	return item;
+	const { _id, ...rest } = item;
+	return { id: _id.toHexString(), ...rest };
 }

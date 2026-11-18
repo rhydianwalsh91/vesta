@@ -13,6 +13,8 @@ describe("assignTag", () => {
 		});
 		const c = collections(db());
 
+		expect(item).not.toHaveProperty("_id");
+
 		expect(item).toMatchObject({
 			name: "Olive oil",
 			location: "Cupboard",
@@ -22,7 +24,7 @@ describe("assignTag", () => {
 		const tag = await c.tags.findOne({ _id: "abc234" });
 		expect(tag).toMatchObject({
 			householdId: "h1",
-			pantryItemId: item._id.toHexString(),
+			pantryItemId: item.id,
 			schemaVersion: 1,
 		});
 	});
