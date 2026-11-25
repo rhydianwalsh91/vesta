@@ -9,78 +9,150 @@
 	--text: var(--ink);
 	--muted: var(--sage);
 	--border: var(--sage);
+	--link: var(--sage);
 	/* Accent and danger are fills: mint is unreadable as text on white, red on ink. */
 	--accent: var(--mint);
 	--on-accent: var(--ink);
 	--danger: var(--red);
 	--on-danger: var(--white);
 
-	--sans: system-ui, "Segoe UI", Roboto, sans-serif;
-	--heading: system-ui, "Segoe UI", Roboto, sans-serif;
-
-	font: 18px / 145% var(--sans);
-	letter-spacing: 0.18px;
+	font:
+		16px / 1.5 system-ui,
+		"Segoe UI",
+		Roboto,
+		sans-serif;
 	color-scheme: light dark;
 	color: var(--text);
 	background: var(--bg);
-	font-synthesis: none;
-	text-rendering: optimizeLegibility;
 	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-
-	@media (max-width: 1024px) {
-		font-size: 16px;
-	}
 }
 
 @media (prefers-color-scheme: dark) {
 	:root {
 		--bg: var(--ink);
 		--text: var(--white);
-		/* Sage on ink is only 3.5:1: fine for borders and large text, not small text. */
+		/* Sage on ink is only 3.5:1, so muted text uses a white/ink mix (7.3:1). */
+		--muted: color-mix(in srgb, var(--white) 60%, var(--ink));
+		--link: var(--mint);
 	}
-}
-
-#root {
-	width: 1126px;
-	max-width: 100%;
-	margin: 0 auto;
-	text-align: center;
-	border-inline: 1px solid var(--border);
-	min-height: 100svh;
-	display: flex;
-	flex-direction: column;
-	box-sizing: border-box;
 }
 
 body {
 	margin: 0;
 }
 
-h1,
-h2 {
-	font-family: var(--heading);
-	font-weight: 500;
+/* Mobile first: one column with a 16px gutter, capped so it stays readable on desktop. */
+#root {
+	max-width: 32rem;
+	min-height: 100svh;
+	margin: 0 auto;
+	padding: 16px;
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
 }
 
 h1 {
-	font-size: 56px;
-	letter-spacing: -1.68px;
-	margin: 32px 0;
-	@media (max-width: 1024px) {
+	font-size: 28px;
+	line-height: 1.2;
+	font-weight: 600;
+	margin: 8px 0 0;
+	@media (min-width: 640px) {
 		font-size: 36px;
-		margin: 20px 0;
 	}
 }
-h2 {
-	font-size: 24px;
-	line-height: 118%;
-	letter-spacing: -0.24px;
-	margin: 0 0 8px;
-	@media (max-width: 1024px) {
-		font-size: 20px;
-	}
-}
+
 p {
 	margin: 0;
+}
+
+a {
+	color: var(--link);
+}
+
+/* Shopping list: full-width rows with 48px tap targets. */
+ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+li {
+	border-bottom: 1px solid var(--border);
+}
+
+li label {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	min-height: 48px;
+	cursor: pointer;
+}
+
+li:has(input:checked) {
+	color: var(--muted);
+}
+
+.qty {
+	margin-left: auto;
+	color: var(--muted);
+}
+
+input[type="checkbox"] {
+	width: 24px;
+	height: 24px;
+	margin: 0;
+	accent-color: var(--accent);
+}
+
+/* Forms */
+form,
+form label {
+	display: grid;
+	gap: 12px;
+}
+
+form label {
+	gap: 4px;
+}
+
+/* 16px font stops iOS zooming into the field on focus. */
+input:not([type="checkbox"]) {
+	font: inherit;
+	padding: 12px;
+	border: 1px solid var(--border);
+	border-radius: 8px;
+	background: var(--bg);
+	color: var(--text);
+}
+
+button {
+	font: inherit;
+	min-height: 48px;
+	padding: 0 20px;
+	border: 1px solid var(--border);
+	border-radius: 12px;
+	background: transparent;
+	color: var(--text);
+	cursor: pointer;
+}
+
+button[type="submit"] {
+	background: var(--accent);
+	border-color: var(--accent);
+	color: var(--on-accent);
+	font-weight: 600;
+}
+
+button:disabled {
+	opacity: 0.6;
+	cursor: default;
+}
+
+.error {
+	padding: 12px;
+	border-radius: 8px;
+	background: var(--danger);
+	color: var(--on-danger);
 }

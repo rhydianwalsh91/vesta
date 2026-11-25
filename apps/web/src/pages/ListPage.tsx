@@ -21,7 +21,11 @@ export function ListPage() {
 		<>
 			<h1>Shopping list</h1>
 			{isPending && <p>Loading…</p>}
-			{isError && <p>Couldn't load the list.</p>}
+			{isError && (
+				<p className="error" role="alert">
+					Couldn't load the list.
+				</p>
+			)}
 			{entries?.length === 0 && <p>Nothing to buy.</p>}
 			{entries && entries.length > 0 && (
 				<ul>
@@ -57,8 +61,11 @@ function ListEntry({ entry }: { entry: ShoppingEntry }) {
 					disabled={toggle.isPending}
 					onChange={(e) => toggle.mutate(e.target.checked)}
 				/>
-				{entry.checked ? <s>{entry.name}</s> : entry.name} × {entry.qty}
-				{entry.unit && ` ${entry.unit}`}
+				{entry.checked ? <s>{entry.name}</s> : entry.name}
+				<span className="qty">
+					× {entry.qty}
+					{entry.unit && ` ${entry.unit}`}
+				</span>
 			</label>
 		</li>
 	);

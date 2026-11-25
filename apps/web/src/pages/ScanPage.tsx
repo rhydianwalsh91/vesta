@@ -29,7 +29,11 @@ export function ScanPage() {
 		<>
 			<h1>Scan</h1>
 			{isPending && <p>Scanning…</p>}
-			{isError && <p>Couldn't scan this tag.</p>}
+			{isError && (
+				<p className="error" role="alert">
+					Couldn't scan this tag.
+				</p>
+			)}
 			{data && <ScanMessage result={data} />}
 			<Link to="/list">View list</Link>
 		</>
@@ -109,7 +113,11 @@ function RegisterForm({ tagId }: { tagId: string }) {
 			<button type="submit" disabled={isPending}>
 				Save
 			</button>
-			{error && <p>{error.message}</p>}
+			{error && (
+				<p className="error" role="alert">
+					{error.message}
+				</p>
+			)}
 		</form>
 	);
 }
@@ -142,7 +150,11 @@ function UndoButton({ scanned }: { scanned: ScannedResult }) {
 			<button type="button" disabled={isPending} onClick={() => mutate()}>
 				Undo
 			</button>
-			{isError && <p>Couldn't undo.</p>}
+			{isError && (
+				<p className="error" role="alert">
+					Couldn't undo.
+				</p>
+			)}
 		</>
 	);
 }
