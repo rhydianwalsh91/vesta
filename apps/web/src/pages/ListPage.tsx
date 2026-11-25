@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ShoppingEntry } from "@vesta/shared";
 import { client } from "../api";
 
@@ -35,10 +35,31 @@ export function ListPage() {
 }
 
 function ListEntry({ entry }: { entry: ShoppingEntry }) {
+	const queryClient = useQueryClient();
+	const toggle = useMutation({
+		mutationFn: async (checked: boolean) => {
+			const res = await client.api.list.entries[":entryId"].$patch({
+				param: { entryId: entry.id },
+				json: { checked },
+			});
+			if (!res.ok) throw new Error(`PATCH entry failed: ${res.status}`);
+		},
+		// Returning the refetch keeps isPending true until the new list arrives.
+		onSuccess: () => queryClient.invalidateQueries({ queryKey: ["list"] }),
+	});
+
 	return (
 		<li>
-			{entry.checked ? <s>{entry.name}</s> : entry.name} × {entry.qty}
-			{entry.unit && ` ${entry.unit}`}
+			<label>
+				<input
+					type="checkbox"
+					checked={entry.checked}
+					disabled={toggle.isPending}
+					onChange={(e) => toggle.mutate(e.target.checked)}
+				/>
+				{entry.checked ? <s>{entry.name}</s> : entry.name} × {entry.qty}
+				{entry.unit && ` ${entry.unit}`}
+			</label>
 		</li>
 	);
 }
