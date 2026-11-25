@@ -1,7 +1,7 @@
 // Throwaway check that we can talk to the Docker Mongo: write one document, read it back.
 import { connect, loadConfig } from "../src/index.js";
 
-const config = loadConfig();
+const config = loadConfig(process.env);
 const { client, db } = await connect(config.MONGODB_URI);
 try {
 	const smoke = db.collection("smoke");

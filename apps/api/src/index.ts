@@ -2,7 +2,7 @@ import { serve } from "@hono/node-server";
 import { connect, loadConfig } from "@vesta/core";
 import { createApp } from "./app.js";
 
-const config = loadConfig();
+const config = loadConfig(process.env);
 const { db } = await connect(config.MONGODB_URI);
 const app = createApp(db, {
 	householdId: config.HOUSEHOLD_ID,

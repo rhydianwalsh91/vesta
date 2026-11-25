@@ -8,6 +8,8 @@ const ConfigSchema = z.object({
 });
 export type Config = z.infer<typeof ConfigSchema>;
 
-export function loadConfig(env = process.env): Config {
+// Takes env rather than reading process.env, so core has no Node globals
+// in the type graph the web app pulls in via AppType.
+export function loadConfig(env: Record<string, string | undefined>): Config {
 	return ConfigSchema.parse(env);
 }
