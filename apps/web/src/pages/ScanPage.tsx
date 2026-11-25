@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { ScanResult } from "@vesta/shared";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router";
 import { client } from "../api";
 
@@ -55,9 +55,63 @@ function ScanMessage({ result }: { result: ScanResult }) {
 				</>
 			);
 		case "unregistered":
-			// The "What's this?" form replaces this in step 10.
-			return <p>New tag. What's this?</p>;
+			return <RegisterForm tagId={result.tagId} />;
 	}
+}
+
+// Registering doesn't add to the list: when writing a batch of tags you
+// aren't out of anything yet. The next scan adds it.
+function RegisterForm({ tagId }: { tagId: string }) {
+	const [name, setName] = useState("");
+	const [location, setLocation] = useState("");
+	const { mutate, data, isPending, error } = useMutation({
+		mutationFn: async () => {
+			const res = await client.api.tags[":tagId"].assign.$post({
+				param: { tagId },
+				// The API rejects an empty location, so leave it out instead.
+				json: { name, location: location.trim() || undefined },
+			});
+			if (res.status === 409) {
+				throw new Error("This tag is already registered.");
+			}
+			if (!res.ok) throw new Error("Couldn't save this tag.");
+			return res.json();
+		},
+	});
+
+	if (data)
+		return <p>Saved {data.name}. Scan it again to add it to the list.</p>;
+
+	return (
+		<form
+			onSubmit={(e) => {
+				e.preventDefault();
+				mutate();
+			}}
+		>
+			<p>New tag. What's this?</p>
+			<label>
+				Name
+				<input
+					value={name}
+					onChange={(e) => setName(e.target.value)}
+					required
+				/>
+			</label>
+			<label>
+				Location (optional)
+				<input
+					value={location}
+					onChange={(e) => setLocation(e.target.value)}
+					placeholder="e.g. cupboard"
+				/>
+			</label>
+			<button type="submit" disabled={isPending}>
+				Save
+			</button>
+			{error && <p>{error.message}</p>}
+		</form>
+	);
 }
 
 type ScannedResult = Exclude<ScanResult, { result: "unregistered" }>;
