@@ -1,0 +1,48 @@
+# Production stack for the hockey VM. Run from the repo root:
+#   docker compose -f compose.prod.yml up -d --build
+# Moving hosts: mongodump here, copy this repo + .env, mongorestore there.
+name: vesta
+
+x-logging: &logging
+  driver: json-file
+  options: { max-size: "10m", max-file: "3" } # the VM's disk is small
+
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    # Cap the cache; mongod otherwise sizes it from the VM's whole memory.
+    command: ["--wiredTigerCacheSizeGB", "0.25"]
+    mem_limit: 512m
+    logging: *logging
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+    volumes:
+      - mongo_data:/data/db
+    # No ports: only the api can reach it, over the compose network.
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    restart: unless-stopped
+    mem_limit: 256m
+    logging: *logging
+    environment:
+      MONGODB_URI: ${MONGODB_URI}
+      HOUSEHOLD_ID: ${HOUSEHOLD_ID}
+      USER_ID: ${USER_ID}
+    # For testing on the home network only. Remove once the tunnel is in front.
+    ports:
+      - "8090:3000"
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+volumes:
+  mongo_data:
